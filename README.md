@@ -5,7 +5,7 @@ Modern, responsive React frontend for the Wisper social network platform. Built 
 
 <div align="center">
 
-![Whisper Logo](Frontend/src/assets/favicon.svg)
+![Whisper Logo](src/assets/favicon.svg)
 
 ## ✨ Features
 
