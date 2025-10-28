@@ -1,0 +1,3 @@
+- Frontend scaffold for Social Network project.
+- Use Vite + React + Tailwind + Axios.
+- Follow repository-wide copilot instructions when making changes.
