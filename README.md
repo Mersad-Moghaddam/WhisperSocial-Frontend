@@ -2,6 +2,11 @@
 
 Modern, responsive React frontend for the Wisper social network platform. Built with React, Vite, and TailwindCSS featuring a peaceful sky-blue aesthetic with cloud animations.
 
+
+<div align="center">
+
+![Whisper Logo](Frontend/src/assets/favicon.svg)
+
 ## ✨ Features
 
 ### Current Features ✅
