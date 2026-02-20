@@ -6,9 +6,6 @@ export function createClient(baseURL) {
   client.interceptors.request.use((config) => {
     try {
       const token = localStorage.getItem('token')
-      // DEBUG: log token presence to help diagnose missing Authorization header
-      // Remove this in production or after debugging
-      console.debug('[api/client] token present:', !!token)
       if (token) {
         config.headers = config.headers || {}
         config.headers.Authorization = `Bearer ${token}`

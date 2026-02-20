@@ -31,6 +31,11 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/timeline/, ''),
         },
+        '/api/admin': {
+          target: env.VITE_ADMIN_URL || 'http://127.0.0.1:8086',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/admin/, ''),
+        },
       },
       open: '/',
     },
