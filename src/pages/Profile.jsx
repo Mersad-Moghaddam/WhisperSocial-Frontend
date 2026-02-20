@@ -59,7 +59,33 @@ export default function Profile() {
   };
 
   useEffect(() => {
-    loadProfile();
+    if (!targetId) return;
+    (async () => {
+      setLoading(true);
+      setUserNotFound(false);
+      setProfile(null);
+      try {
+        const p = await getUserProfile(targetId);
+        setProfile(p);
+        const s = await getStats(targetId);
+        setStats(s);
+        if (currentUserId && currentUserId !== targetId) {
+          const f = await isFollowing(targetId);
+          setFollowingState(!!f.is_following);
+        } else {
+          setFollowingState(false);
+        }
+      } catch (e) {
+        if (e?.response?.status === 404) {
+          setUserNotFound(true);
+        } else {
+          console.error('Failed to fetch profile data:', e);
+          toast.error(e?.response?.data?.error || 'Failed to load profile');
+        }
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, [targetId, currentUserId]);
 
   const handleFollowToggle = async () => {

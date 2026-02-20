@@ -3,13 +3,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 export default function Navbar() {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, user } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
+
+  const isAdmin = user?.role === 'admin';
 
   return (
     <nav className="bg-gradient-to-r from-[#e0f2fe] via-[#f0f9ff] to-[#e0f2fe] backdrop-blur-lg border-b border-[#bae6fd] sticky top-0 z-50 shadow-wisper-sm">
@@ -36,6 +38,14 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           {isAuthenticated ? (
             <>
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className="px-4 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:shadow-md rounded-xl transition-all no-underline"
+                >
+                  Admin Panel
+                </Link>
+              )}
               <Link
                 to="/timeline"
                 className="px-4 py-2.5 text-sm font-medium text-[#0f172a] hover:bg-[#f0f9ff] rounded-xl transition-all no-underline"

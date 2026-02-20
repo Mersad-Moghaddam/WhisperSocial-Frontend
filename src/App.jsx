@@ -6,8 +6,10 @@ import Register from './pages/Register';
 import Timeline from './pages/Timeline';
 import CreateWisper from './pages/CreateWisper';
 import Profile from './pages/Profile';
+import AdminDashboard from './pages/AdminDashboard';
 import MainLayout from './layouts/MainLayout';
 import { useAuth } from './hooks/useAuth';
+import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 import PropTypes from 'prop-types';
 
 function ProtectedRoute({ children }) {
@@ -26,6 +28,16 @@ export default function App() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+
+      {/* Admin Dashboard */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedAdminRoute>
+            <AdminDashboard />
+          </ProtectedAdminRoute>
+        }
+      />
 
       <Route
         path="/timeline"

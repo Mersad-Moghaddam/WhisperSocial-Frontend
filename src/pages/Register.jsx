@@ -26,10 +26,10 @@ export default function Register() {
     }
     try {
       await register(email, password);
-      toast.success('Account created! Please sign in.');
+      toast.success('Account created! Redirecting to your feed...');
       setTimeout(() => {
-        navigate('/login');
-      }, 1500);
+        navigate('/timeline');
+      }, 1000);
     } catch (err) {
       toast.error(err?.response?.data?.error || 'Registration failed');
     }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import { useAuth } from '../hooks/useAuth';
@@ -10,12 +10,41 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const next = params.get('next') || null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const data = await login(email, password);
       if (data && data.token) {
+        // Prefer explicit user object returned by the auth API
+        const roleFromUser = data.user?.role;
+        if (next === 'admin') {
+          if (roleFromUser === 'admin') {
+            toast.success('Admin login successful');
+            navigate('/admin', { replace: true });
+            return;
+          }
+
+          // Fallback to token claim if server didn't return user role
+          try {
+            const decoded = JSON.parse(atob(data.token.split('.')[1]));
+            const role = decoded.role || 'user';
+            if (role === 'admin') {
+              toast.success('Admin login successful');
+              navigate('/admin', { replace: true });
+              return;
+            }
+          } catch (err) {
+            // ignore
+          }
+
+          toast.error('You are not an admin.');
+          return;
+        }
+
         toast.success('Logged in successfully');
         navigate('/timeline', { replace: true });
       }

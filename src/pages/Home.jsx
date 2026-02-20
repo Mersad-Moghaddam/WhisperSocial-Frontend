@@ -1,6 +1,189 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { useState } from 'react';
+import { toast } from 'react-toastify';
+
+// Admin Login Section Component
+function AdminLoginSection({ navigate }) {
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { login: authLogin } = useAuth();
+
+  const handleAdminLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const response = await authLogin(email, password);
+
+      if (response && response.token) {
+        // Prefer server-provided user object when available
+        const isAdminFromUser = response.user && response.user.role === 'admin';
+
+        if (!isAdminFromUser) {
+          // Fallback to token claim if server didn't return full user
+          try {
+            const tokenData = JSON.parse(atob(response.token.split('.')[1]));
+            if (tokenData.role !== 'admin') {
+              toast.error('Only administrators can access the admin panel', {
+                position: 'top-right',
+                autoClose: 3000,
+              });
+              setLoading(false);
+              return;
+            }
+          } catch (e) {
+            // if token doesn't include role and server didn't return user, deny
+            toast.error('Unable to verify admin role. Please login via full login page.', { position: 'top-right', autoClose: 3000 });
+            setLoading(false);
+            return;
+          }
+        }
+
+        // Store token and user info
+        try { localStorage.setItem('token', response.token) } catch (e) {}
+        if (response.user) {
+          try { localStorage.setItem('user', JSON.stringify(response.user)) } catch (e) {}
+        }
+
+        toast.success('Admin login successful!', {
+          position: 'top-right',
+          autoClose: 1000,
+        });
+
+        // Redirect to admin dashboard
+        setTimeout(() => navigate('/admin'), 400);
+      }
+    } catch (error) {
+      const errorMsg = error.response?.data?.error || 'Login failed. Please try again.';
+      toast.error(errorMsg, {
+        position: 'top-right',
+        autoClose: 3000,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const tryOpenAdminPanel = () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // show form to login
+      setShowAdminLogin(true);
+      toast.info('Please sign in as an administrator to access the admin panel', { position: 'top-right', autoClose: 2500 });
+      return;
+    }
+
+    try {
+      // check stored user first
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        try {
+          const u = JSON.parse(storedUser);
+          if (u.role === 'admin') {
+            navigate('/admin');
+            return;
+          }
+        } catch (e) { /* ignore parse */ }
+      }
+
+      const tokenData = JSON.parse(atob(token.split('.')[1]));
+      if (tokenData.role === 'admin') {
+        navigate('/admin');
+        return;
+      }
+      // not admin
+      setShowAdminLogin(true);
+      toast.error('Your account is not an administrator. Please login with an admin account.', { position: 'top-right', autoClose: 3000 });
+    } catch (err) {
+      // malformed token, prompt login
+      setShowAdminLogin(true);
+      toast.error('Invalid session. Please login as administrator.', { position: 'top-right', autoClose: 3000 });
+    }
+  };
+
+  return (
+    <div className="max-w-md mx-auto">
+      {!showAdminLogin ? (
+        <div className="flex flex-col gap-3">
+          <button
+            onClick={() => setShowAdminLogin(true)}
+            className="w-full px-6 py-3 bg-white text-[#0f172a] font-semibold rounded-lg hover:bg-[#e0f2fe] transition-all border-2 border-white hover:border-[#06b6d4]"
+          >
+            Admin Login
+          </button>
+          <button
+            onClick={tryOpenAdminPanel}
+            className="w-full px-6 py-3 bg-transparent text-white border border-white rounded-lg hover:bg-white/10 transition-all"
+          >
+            Open Admin Panel
+          </button>
+        </div>
+      ) : (
+        <div className="bg-white rounded-xl shadow-2xl p-8">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-2xl font-bold text-[#0f172a]">Admin Login</h3>
+            <button
+              onClick={() => {
+                setShowAdminLogin(false);
+                setEmail('');
+                setPassword('');
+              }}
+              className="text-gray-400 hover:text-gray-600 text-2xl"
+            >
+              ×
+            </button>
+          </div>
+
+          <form onSubmit={handleAdminLogin}>
+            <div className="mb-4">
+              <label className="block text-sm font-semibold text-[#0f172a] mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your admin email"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20"
+                required
+              />
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-[#0f172a] mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full px-6 py-3 bg-gradient-to-r from-[#06b6d4] to-[#0891b2] text-white font-semibold rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Logging in...' : 'Login'}
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-gray-500 mt-4">
+            Not an admin? This page is restricted to administrators only.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Home() {
   const navigate = useNavigate();
@@ -803,6 +986,22 @@ export default function Home() {
               </button>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Admin Access Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 relative z-10 bg-gradient-to-r from-[#0f172a] to-[#1e293b]">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              Admin Access
+            </h2>
+            <p className="text-[#cbd5e1] text-lg">
+              Platform administrators can access the admin panel here
+            </p>
+          </div>
+          
+          <AdminLoginSection navigate={navigate} />
         </div>
       </section>
 
