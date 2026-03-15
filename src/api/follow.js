@@ -1,6 +1,6 @@
 import { createClient } from './client'
 
-const followBase = import.meta.env.DEV ? '/api/follow' : import.meta.env.VITE_FOLLOW_URL || 'http://127.0.0.1:8082'
+const followBase = import.meta.env.DEV ? '/api/follow' : import.meta.env.VITE_FOLLOW_URL || 'http://127.0.0.1:8085'
 const client = createClient(followBase)
 
 export async function follow(user_id) {
