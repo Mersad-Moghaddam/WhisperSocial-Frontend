@@ -1,55 +1,29 @@
-import axios from 'axios'
+import { createClient } from './client'
 
-const adminBase = import.meta.env.DEV ? '/api/admin' : import.meta.env.VITE_ADMIN_URL || 'http://127.0.0.1:8086'
+const adminBase = import.meta.env.DEV
+  ? '/api/admin'
+  : import.meta.env.VITE_ADMIN_URL || 'http://127.0.0.1:8086'
 
-const client = axios.create({
-  baseURL: adminBase,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
-
-// Add token to requests
-client.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
+const client = createClient(adminBase)
 
 export const admin = {
-  // Post Management
-  removePost: (postId, reason) =>
-    client.post('/admin/posts/remove', { post_id: postId, reason }),
+  getStats: () => client.get('/admin/stats'),
 
-  getAllPosts: (limit = 50, offset = 0, onlyRemoved = false) =>
-    client.get('/admin/posts', { params: { limit, offset, only_removed: onlyRemoved } }),
-
-  getUserPosts: (userId, limit = 50, offset = 0) =>
-    client.get(`/admin/posts/user/${userId}`, { params: { limit, offset } }),
-
-  // Posting Restrictions
-  restrictUserPosting: (userId, durationMinutes, reason) =>
-    client.post('/admin/restrictions/posting', {
-      user_id: userId,
-      duration_minutes: durationMinutes,
-      reason,
+  getUsers: (status) =>
+    client.get('/admin/users', {
+      params: status ? { status } : undefined,
     }),
 
-  removePostRestriction: (userId) =>
-    client.delete(`/admin/restrictions/posting/${userId}`),
+  getUserById: (userId) => client.get(`/admin/users/${userId}`),
 
-  // Account Management
-  deactivateUser: (userId, reason) =>
-    client.post('/admin/users/deactivate', { user_id: userId, reason }),
+  updateUserStatus: (userId, status) =>
+    client.patch(`/admin/users/${userId}`, { status }),
 
-  reactivateUser: (userId) =>
-    client.post('/admin/users/reactivate', { user_id: userId }),
+  getPosts: () => client.get('/admin/posts'),
 
-  // User Details
-  getUserDetails: (userId) =>
-    client.get(`/admin/users/${userId}`),
+  getPostById: (postId) => client.get(`/admin/posts/${postId}`),
+
+  deletePost: (postId) => client.delete(`/admin/posts/${postId}`),
 }
 
 export default client

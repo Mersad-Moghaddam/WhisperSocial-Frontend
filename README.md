@@ -23,6 +23,7 @@ Modern, responsive React frontend for the Wisper social network platform. Built 
 - **📱 Responsive Design** - Works beautifully on all devices
 - **⚡ Fast Navigation** - Client-side routing with React Router
 - **🔄 Real-time Updates** - Manual refresh to get latest wispers
+- **🛡️ Admin Moderation Panel** - Stats, user status controls, and post moderation tools
 
 ### Design System
 
@@ -151,6 +152,7 @@ Frontend/
 | `/timeline/create-post` | CreateWisper | Protected | Create new wisper |
 | `/timeline/profile` | Profile | Protected | Current user's profile |
 | `/timeline/profile/:id` | Profile | Protected | View other user's profile |
+| `/admin` | AdminDashboard | Protected (Admin) | Admin metrics + moderation tools |
 
 ### Route Protection
 
@@ -255,6 +257,15 @@ const { is_following } = await isFollowing(42);
 // Get statistics
 const { followers_count, following_count } = await getStats(42);
 ```
+
+
+## 📸 UI Preview
+
+### Landing Page
+![Landing page](browser:/tmp/codex_browser_invocations/159bfab1627706ef/artifacts/artifacts/homepage.png)
+
+### Admin Dashboard
+![Admin dashboard](browser:/tmp/codex_browser_invocations/159bfab1627706ef/artifacts/artifacts/admin-dashboard.png)
 
 ## 🎨 Styling
 

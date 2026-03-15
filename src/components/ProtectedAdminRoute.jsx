@@ -1,3 +1,5 @@
+import React from 'react'
+import PropTypes from 'prop-types'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
@@ -10,4 +12,8 @@ export default function ProtectedAdminRoute({ children }) {
   }
 
   return children
+}
+
+ProtectedAdminRoute.propTypes = {
+  children: PropTypes.node.isRequired,
 }

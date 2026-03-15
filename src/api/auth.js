@@ -1,7 +1,7 @@
 import { createClient } from './client'
 
 // Use proxied path in dev: Vite will forward /api/auth to the auth service.
-const authBase = import.meta.env.DEV ? '/api/auth' : import.meta.env.VITE_AUTH_URL || 'http://127.0.0.1:8080'
+const authBase = import.meta.env.DEV ? '/api/auth' : import.meta.env.VITE_AUTH_URL || 'http://127.0.0.1:8083'
 const client = createClient(authBase)
 
 export async function login(email, password) {

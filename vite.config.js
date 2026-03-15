@@ -12,22 +12,22 @@ export default defineConfig(({ mode }) => {
         // Proxy API calls in dev to backend services to avoid CORS issues.
         // Each entry rewrites the /api/<service> prefix before forwarding.
         '/api/auth': {
-          target: env.VITE_AUTH_URL || 'http://127.0.0.1:8080',
+          target: env.VITE_AUTH_URL || 'http://127.0.0.1:8083',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/auth/, ''),
         },
         '/api/posts': {
-          target: env.VITE_POST_URL || 'http://127.0.0.1:8084',
+          target: env.VITE_POST_URL || 'http://127.0.0.1:8081',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/posts/, ''),
         },
         '/api/follow': {
-          target: env.VITE_FOLLOW_URL || 'http://127.0.0.1:8082',
+          target: env.VITE_FOLLOW_URL || 'http://127.0.0.1:8085',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/follow/, ''),
         },
         '/api/timeline': {
-          target: env.VITE_TIMELINE_URL || 'http://127.0.0.1:8085',
+          target: env.VITE_TIMELINE_URL || 'http://127.0.0.1:8082',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/timeline/, ''),
         },
